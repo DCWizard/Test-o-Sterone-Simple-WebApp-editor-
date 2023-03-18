@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
+<style>
+#Copyright { /* Copyright © 2020-2022 Denis Cote ThinknSpeak */
+	position: absolute; 
+  left: 2ex; 
+  bottom: 0.5em; 
+  color: #efefef9f; 
+  font-size: small; 
+  padding: 0; 	
+  margin: 0;
+	z-index: 2147483647;
+}
+body {
+  padding: 0;    margin: 0;
+  font-family: sans-serif;
+}
+.grid {
+	display: inline;
+	float: left;
+	padding: 1.0vw 1.5vh;
+	box-sizing: border-box;
+}
+.container {
+  background: #e3e3e3;
+  border-right: 1px solid white;
+}
+.output {
+  border-left: 1px solid #e3e3e3;
+}
+h2 {
+	float: left;
+  margin: 0 1.5vw 0 0;
+	padding: 0;
+  font-size: min(2.50vh, 2.5vw);
+	margin-block-start: .01vh;
+	margin-block-end: .01vh;
+}
+textarea {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 28.5vh;
+	resize: none;
+	font-size: min(1.75vh, 1.75vw);
+	font-weight: bolder;
+}
+form {
+	margin: 0;
+	padding: 0;
+	height: 94.5vh;
+  margin-top: 1vh;
+}
+iframe {
+  margin: 0;
+  padding: 0;
+  display: block;
+  width: 100%;
+  height: 97vh;
+  border: 1px solid black;
+}
+button {
+	float: left;
+	font-size: min(2.50vh, 2.5vw);
+	font-weight: bolder;
+  margin: -0.5vh;
+}
+#DisableInput {
+	position: absolute;
+	left: 0;
+	width: 50%;
+	top: 0;
+	Height: 90vh;
+	background: #3ebece77;
+	z-index: 100;
+}
+</style>
+</head>
+<body>
+<div class="container grid" style="width: 70%;">
+  <form>
+    <button id="Retract" type="button" style="left: 67.35%;top: 0;position: absolute;display: block;z-index: 10; " onclick="RetractAll(event)">⇓</button> 
+    <h2>HTML</h2> <button id="ReloadHtml" type="button">Reload&nbsp;&nbsp;</button> <button id="ExpendHtml" type="button" onclick="ExpandHtml(event)">⇑</button> 
+    <textarea id="RemoteHtml" ></textarea>
+    <h2>CSS3</h2> <button id="ReloadCss" type="button">Reload&nbsp;&nbsp;</button></button> <button id="ExpendCss" type="button" onclick="ExpandCss(event)">⇑</button>  
+    <textarea id="RemoteCSS"></textarea>
+    <h2>SRIPT</h2> <button id="ReloadScript" type="button" style="color: darkgreen;">Reload&nbsp;&nbsp;</button> <button id="ExpendScript" type="button" onclick="ExpandScript(event)">⇑</button> 
+     <!-- <h2 style="color:crimson; "> &nbsp <<< &nbsp [ Important! Not auto ] </h2> -->
+    <textarea id="RemoteScript"></textarea>
+  </form>
+</div>
+<div id="DisableInput"></div><div>
+
+<div id="IFrameThis" class="output grid" style="width: 30%;height: 100vh;">
+  <iframe id="TheTestIFrame"></iframe>
+</div>
+<p id="Copyright" >Copyright © 2020-2022 Denis Cote ThinknSpeak</p>
+<script>
+function RetractAll (ThisEvent){
+  TextHtml.style.top        = "";
+  TextHtml.style.position   = "";
+  TextHtml.style.height     = "";
+  TextHtml.style.zIndex     = "";
+
+  TextCss.style.top         = "";
+  TextCss.style.position    = "";
+  TextCss.style.height      = "";
+  TextCss.style.zIndex      = "";
+  
+  TextScript.style.top      = "";
+  TextScript.style.position = "";
+  TextScript.style.height   = "";
+  TextScript.style.zIndex   = "";
+}
+function ExpandHtml (ThisEvent){
+  TextHtml.style.top        = "-4.5vh";
+  TextHtml.style.position   = "relative";
+  TextHtml.style.height     = "96vh";
+  TextHtml.style.zIndex     = "1";
+}
+function ExpandCss (ThisEvent){
+  TextCss.style.top         = "-36.5vh";
+  TextCss.style.position    = "relative";
+  TextCss.style.height      = "96vh";
+  TextCss.style.zIndex      = "1";
+}
+function ExpandScript (ThisEvent){
+  TextScript.style.top      = "-68.5vh";
+  TextScript.style.position = "relative";
+  TextScript.style.height   = "96vh";
+  TextScript.style.zIndex   = "1";
+}
+// IsNotNull Check if it's initialized and only so.
+// A value of 0 or an empty string are values. They have to be initialized to.
+
+function IsNull                 (ThisValue)          { return ((ThisValue === undefined) || (ThisValue === null) );}
+function IsNotNull              (ThisValue)          { return ((ThisValue !== undefined) && (ThisValue !== null) );}
+function IsFunction             (ThisCallBack)       { return ((typeof ThisCallBack === 'function')); } 
+function WaitForObjMember       (ThisObj, ThisMember, ThisCallback){
+
+  if((IsNotNull(ThisObj[ThisMember]))
+  ){
+    if(IsFunction(ThisCallback)){
+      ThisCallback();
+    }
+    return ThisObj;
+  }
+  let ThisInterval              = setInterval (function (){
+    if((IsNotNull(ThisObj[ThisMember]))
+    ){
+     clearInterval(ThisInterval);
+     if(IsFunction(ThisCallback)){
+        ThisCallback();
+     }
+    } else {
+      console.log("Object "+ ThisMember +" not yet defined...");
+    }
+  }, 125);
+  return ThisObj;
+}
+function WaitForDocumentReady   (ThisDoc, ThisCallback){
+  
+  if((ThisDoc.readyState  === "complete" )
+  || (ThisDoc.readyState  === "interactive") 
+  ){
+    ThisCallback(null);
+  } else{
+    ThisDoc.addEventListener("DOMContentLoaded", OnContentLoaded);
+  }
+  function OnContentLoaded(ThisEvent){
+    removeEventListener("DOMContentLoaded", OnContentLoaded);
+    ThisCallback(ThisEvent);
+  }
+}
+
+var TheIFrameObj                = {};
+WaitForDocumentReady              (document, function(){
+  window.TextHtml               = document.getElementById("RemoteHtml");    TextHtml.spellcheck = false;
+  window.TextCss                = document.getElementById("RemoteCSS");     TextCss.spellcheck = false;
+  window.TextScript             = document.getElementById("RemoteScript");  TextScript.spellcheck = false;
+
+  ConnectIFrameById(TheIFrameObj, "TheTestIFrame", function (){
+    if(TextHtml.value){
+       TheIFrameObj.TheBody.innerHTML = TextHtml.value;
+    }
+    if(TextCss.value){
+       TheIFrameObj.TheStyle.innerHTML = TextCss.value;
+    }
+    // THE EVENTS
+    document.getElementById("RemoteHtml")  .onkeyup = function (e) {
+      if(TheIFrameObj.TheBody){
+        TheIFrameObj.TheBody.innerHTML    = e.target.value;
+      }
+    };
+    document.getElementById("ReloadHtml")  .onclick = function (e) {
+      if(TheIFrameObj.TheBody){
+        TheIFrameObj.TheBody.innerHTML    = TextHtml.value;
+      }
+    };
+    document.getElementById("RemoteCSS")   .onkeyup = function (e) {
+      if(TheIFrameObj.TheStyle){
+        TheIFrameObj.TheStyle.innerHTML   = e.target.value;
+      }
+    };
+    document.getElementById("ReloadCss")   .onclick = function (e) {
+      if(TheIFrameObj.TheStyle){
+        TheIFrameObj.TheStyle.innerHTML   = TextCss.value;
+      }
+    };
+    document.getElementById("ReloadScript").onclick = function (e) {
+      if(TheIFrameObj.TheStyle){
+        let ThisScript                    = TextScript.value;
+        // ReStartIFrameById (TheIFrameObj, "TheTestIFrame", function (){
+        DelIFrameScriptById (TheIFrameObj, "SlaveScript", function (){
+          TheIFrameObj.TheScript          = AddIFrameScript(TheIFrameObj, "SlaveScript", ThisScript);
+        });
+      }
+    };
+    document.getElementById("DisableInput").style.width = "0px";
+  });
+});
+
+
+// HERE IS THE LIBRARY OF FUNCTIONS TO HANDLE IFRAME SCRIPT
+// AN ID IS NEEDED (.) PERIOD! DON'T WANT TO WORK WITH ID? FUCK YOU! REWRITE IT YOURSELF. LIKE I HAD TO DO.
+// AN ID SAYS I AM WHO I AM AND I'M UNIQUE. LIKE ME.
+function ConnectIFrameById            (ThisFrameObj, ThisId, ThisCallBack){
+  ThisFrameObj.TheIFrame        = document.getElementById(ThisId);
+
+  WaitForObjMember(ThisFrameObj.TheIFrame, "contentDocument", function() {
+    setTimeout(function(){
+      ThisFrameObj.TheWindow    = ThisFrameObj.TheIFrame.contentWindow; // ThisFrameObj.frames[0].Window;
+      ThisFrameObj.TheDocument  = ThisFrameObj.TheIFrame.contentDocument;
+      ThisFrameObj.TheHtml      = ThisFrameObj.TheDocument.documentElement; 
+      ThisFrameObj.TheHead      = ThisFrameObj.TheDocument.head;
+      ThisFrameObj.TheBody      = ThisFrameObj.TheDocument.body;
+      ThisFrameObj.TheStyle     = AddIFrameStyle(ThisFrameObj, "SlaveStyle"); 
+
+      if(IsFunction(ThisCallBack)){
+        ThisCallBack();
+      }
+    }, 33);
+  });
+}
+function AddIFrameStyle               (ThisFrameObj, ThisId){
+  let ThisStyleObj       = ThisFrameObj.TheDocument.createElement('style');
+  ThisStyleObj.id        = ThisId;
+  ThisStyleObj.type      = 'text/css';
+  ThisFrameObj.TheHead.appendChild(ThisStyleObj);
+  return ThisStyleObj;
+}
+function AddIFrameScript              (ThisFrameObj, ThisId, ThisScript, ThisCallBack){
+  WaitForObjMember(ThisFrameObj, "TheBody", function() {
+    let ThisScriptObj               = ThisFrameObj.TheDocument.createElement('script'); 
+    ThisScriptObj.id                = ThisId;
+    ThisScriptObj.innerHTML         = ThisScript;
+    ThisFrameObj.TheHtml.appendChild  (ThisScriptObj);
+
+    // console.log("ThisScriptObj:", ThisScriptObj);
+    if(IsFunction(ThisCallBack)){
+      ThisCallBack(ThisScriptObj);
+    }
+    return ThisScriptObj; // IN CASE I FEEL LIKE IMPEMENTING RESOLVE
+  });
+}
+function ReStartIFrameById            (ThisFrameObj, ThisId, ThisCallBack){
+let ThisIFrameElem          = document.getElementById(ThisId).parentElement;
+
+  ThisFrameObj.TheWindow    = null; // ThisFrameObj.frames[0].Window;
+  ThisFrameObj.TheDocument  = null;
+  ThisFrameObj.TheHtml      = null; 
+  ThisFrameObj.TheHead      = null;
+  ThisFrameObj.TheBody      = null;
+  ThisFrameObj.TheStyle     = null; 
+
+  ThisIFrameElem.innerHTML= "";
+  setTimeout(function (){
+    ThisIFrameElem.innerHTML= `<iframe id="${ThisId}"></iframe>`;
+    ConnectIFrameById(ThisFrameObj, ThisId, ThisCallBack);
+  }, 33);
+}
+function DelIFrameScriptById          (ThisFrameObj, ThisId, ThisCallBack){
+let ThisScriptObj                   = ThisFrameObj.TheDocument.getElementById(ThisId);
+
+  if(IsNotNull(ThisScriptObj)){  
+    ThisScriptObj.parentElement
+    ThisScriptObj.outerHTML = "";
+  }
+  if(IsFunction(ThisCallBack)){
+    ThisCallBack();
+  }
+}
+
+function IsIFrameFunctionAvailable    (ThisFrameObj, ThisFunctionName){
+  let ThisFound = false;
+  EnumFunctionsOfContentWindow        (ThisFrameObj, function(ThisFunc, ThisValue){
+    if(ThisFunctionName  == ThisFunc){
+      return ThisFound    = true;
+    } 
+    return false;
+  });
+  return ThisFound;
+} 
+function IsIFrameVarAvailable         (ThisFrameObj, ThisVarName){
+  let ThisFound = false;
+  EnumVarsOfContentWindow             (ThisFrameObj, function(ThisVar, ThisValue){
+    if(ThisVarName       == ThisVar){
+      return ThisFound    = true;
+    }
+    return false;
+  });
+  return ThisFound;
+} 
+function EnumFunctionsOfContentWindow (ThisFrameObj, ThisCallBack){
+  WaitForObjMember(ThisFrameObj,     "TheBody", function() {
+    for(let EachFunc  in ThisFrameObj.TheWindow){
+      if((IsFunction(ThisFrameObj.TheWindow[EachFunc])) 
+      && (ThisFrameObj.TheWindow[EachFunc])
+      ){
+        if(IsFunction(ThisCallBack)){
+          if(ThisCallBack(EachFunc, ThisFrameObj.TheWindow)){
+            return;
+          }
+        } else {
+          console.log(EachFunc, ThisFrameObj.TheWindow[EachFunc]);
+        }
+      }
+    };
+  });
+}
+function EnumVarsOfContentWindow      (ThisFrameObj, ThisCallBack){
+  WaitForObjMember(ThisFrameObj,     "TheBody", function() {
+    for(let EachFunc  in ThisFrameObj.TheWindow){
+      if( !(IsFunction(ThisFrameObj.TheWindow[EachFunc])) 
+      && (ThisFrameObj.TheWindow[EachFunc])
+      ){
+        if(IsFunction(ThisCallBack)){
+          if(ThisCallBack(EachFunc, ThisFrameObj.TheWindow)){
+            return;
+          }
+        } else {
+          console.log(EachFunc, ThisFrameObj.TheWindow[EachFunc]);
+        }
+      }
+    };
+  });
+}
+
+</script>
+
+</body>
+</html>
+
